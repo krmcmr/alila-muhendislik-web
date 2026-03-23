@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Detail | Alila Engineering</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/jpeg" href="assets/images/ui/favicon.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">
+                <img src="assets/images/ui/favicon.jpg" alt="Alila Logo">
+                <div class="logo-text">ALİLA <span>ENGINEERING</span></div>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">HOME</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">ACTIVITY AREAS <i class="fas fa-chevron-down arrow-icon"></i></a>
+                    <ul class="dropdown-content">
+                        <li><a href="projeler.html?category=altyapi">Infrastructure Works</a></li>
+                        <li><a href="projeler.html?category=konut">Superstructure & Housing</a></li>
+                        <li><a href="projeler.html?category=endustriyel">Industrial Facilities</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="projeler.html" class="nav-link" style="color: var(--brand-orange);">PROJECTS <i class="fas fa-chevron-down arrow-icon"></i></a>
+                    <ul class="dropdown-content">
+                        <li><a href="projeler.html?status=tamamlandi">Completed Projects</a></li>
+                        <li><a href="projeler.html?status=devam-ediyor">In Progress Projects</a></li>
+                        <li><a href="projeler.html">All Projects</a></li>
+                    </ul>
+                </li>
+                <li><a href="index.html#services" class="nav-link">SERVICES</a></li>
+                <li><a href="iletisim.html" class="nav-link">CONTACT</a></li>
+
+                <li class="lang-menu">
+                    <a href="#" class="active-lang">TR</a>
+                    <span class="lang-sep">|</span>
+                    <a href="en/index.html" class="passive-lang">EN</a>
+                </li>
+            </ul>
+            </ul>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+
+    <section class="section-padding" style="margin-top: 50px;">
+        <div class="container">
+            
+            <div class="detail-header">
+                <a href="javascript:history.back()" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+                <h1 id="detail-title">Project Loading...</h1>
+            </div>
+
+            <div class="detail-wrapper">
+                <div class="detail-image-box">
+                    <img id="detail-image" src="" alt="Project Image">
+                </div>
+
+                <div class="detail-info-card">
+                    <h3>Project Summary</h3>
+                    <ul class="info-list">
+                        <li><strong>Category:</strong> <span id="detail-category">-</span></li>
+                        <li><strong>Status:</strong> <span id="detail-status">-</span></li>
+                        <li><strong>Location:</strong> <span id="detail-location">-</span></li>
+                        <li><strong>Client:</strong> <span id="detail-client">Alila Engineering</span></li> 
+                    </ul>
+                </div>
+            </div>
+
+            <div class="detail-description-box">
+                <h2>About the Project</h2>
+                <p id="detail-description">Loading project details. Please wait...</p>
+            </div>
+
+            <div class="detail-gallery-box">
+                <h3>Project Images</h3>
+                <div id="detail-gallery" class="gallery-grid">
+                    
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="copyright-bar">
+            <div class="container">
+                <p>&copy; 2026 Alila Engineering. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

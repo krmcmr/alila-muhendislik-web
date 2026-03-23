@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projelerimiz | Alila Mühendislik</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/jpeg" href="assets/images/ui/favicon.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <header>
+        <nav>
+            <a href="index.html" class="logo">
+                <img src="assets/images/ui/favicon.jpg" alt="Alila Logo">
+                <div class="logo-text">ALİLA <span>MÜHENDİSLİK</span></div>
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">ANASAYFA</a></li>
+                
+                <li class="dropdown">
+                    <a href="projeler.html" class="nav-link" style="color: var(--brand-orange);">PROJELERİMİZ <i class="fas fa-chevron-down arrow-icon"></i></a>
+                    <ul class="dropdown-content">
+                        <li><a href="projeler.html?status=tamamlandi">Tamamlanan Projeler</a></li>
+                        <li><a href="projeler.html?status=devam-ediyor">Devam Eden Projeler</a></li>
+                        <li><a href="projeler.html">Tüm Projeler</a></li>
+                    </ul>
+                </li>
+                
+                <li><a href="index.html#services" class="nav-link">HİZMETLER</a></li>
+                <li><a href="iletisim.html" class="nav-link">İLETİŞİM</a></li>
+
+                <li class="lang-menu">
+                    <a href="#" class="active-lang">TR</a>
+                    <span class="lang-sep">|</span>
+                    <a href="en/index.html" class="passive-lang">EN</a>
+                </li>
+            </ul>
+            </ul>
+
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+        </header>
+    </header>
+
+    <section class="page-header" style="margin-top: 70px;">
+        <div class="container" data-aos="fade-up">
+            <h1>Projelerimiz</h1>
+            <p>Tamamlanan ve devam eden tüm mühendislik çözümlerimiz.</p>
+        </div>
+    </section>
+
+    <section class="section-padding">
+        <div class="container">
+            <div id="project-list" class="projects-grid">
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Alila Mühendislik. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

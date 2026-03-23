@@ -1,0 +1,53 @@
+[
+    {
+        "id": 1,
+        "title": "Madenli 1936/8 Apartment Project",
+        "category": "Housing",
+        "status": "Completed",
+        "location": "Hatay / Arsuz",
+        "image": "assets/images/MADENLİ1.png",
+        "gallery": [
+            "assets/images/MADENLİ2.png",
+            "assets/images/MADENLİ3.png",
+            "assets/images/MADENLİ4.png"
+        ]
+
+
+        
+    },
+    {
+        "id": 2,
+        "title": "Anıl Mazmancı Apartment",
+        "category": "Housing",
+        "status": "In Progress",
+        "location": "Hatay / Arsuz",
+        "image": "assets/images/Anıl1.png"
+    },
+    {
+        "id": 3,
+        "title": "KABEV 26/3 Apartment Project",
+        "category": "Housing",
+        "status": "In Progress",
+        "location": "Hatay / Arsuz",
+        "image": "assets/images/KABEV1.png",
+        "gallery": [
+            "assets/images/KABEV2.png",
+            "assets/images/KABEV3.png",
+            "assets/images/KABEV4.png"
+        ]
+    },
+    {
+        "id": 4,
+        "title": "Micana Villa Project",
+        "category": "Housing",
+        "status": "In Progress",
+        "location": "Hatay / Arsuz",
+        "image": "assets/images/Micana1.png",
+        "gallery": [
+            "assets/images/Micana2.png",
+            "assets/images/Micana3.png",
+            "assets/images/Micana4.png"
+        ]
+        
+    }
+]
