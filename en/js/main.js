@@ -1,178 +1,255 @@
+
 document.addEventListener('DOMContentLoaded', () => {
-
-    // AOS (Animasyon) Kütüphanesini Başlat
-    AOS.init({
-        duration: 800, // Animasyonun süresi (0.8 saniye)
-        easing: 'ease-in-out', // Yumuşak başla, yumuşak bitir
-        once: true, // Aşağı kaydırınca çalışsın, yukarı çıkınca tekrarlamasın (Daha kurumsal durur)
-        offset: 100 // Eleman ekranda 100px göründüğünde animasyon başlasın
-    });
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-
-    if(hamburger) {
-        hamburger.addEventListener('click', () => {
-            // İkona tıklanınca menüye 'active' sınıfını ekle/çıkar
-            navMenu.classList.toggle('active');
-            
-            // Tıklayınca ikon üç çizgiden "X" çarpı işaretine dönsün
-            if(navMenu.classList.contains('active')) {
-                hamburger.innerHTML = '<i class="fas fa-times"></i>';
-            } else {
-                hamburger.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-        });
-    }
-    // Sayfada "project-list" kutusu varsa (Ana Sayfa veya Projeler sayfası)
-    if (document.getElementById('project-list')) {
-        loadProjects();
-    } 
-
-    if (document.getElementById('detail-title')) {
-        loadProjectDetail();
-    }
-    
-    // Sayfada "project-detail-content" kutusu varsa (Detay sayfası)
-    if (document.getElementById('project-detail-content')) {
-        loadProjectDetails();
-    }
+  initAOS();
+  initMobileMenu();
+  initScrollAnimations();
+  highlightActiveLinks();
+  if (document.getElementById('project-list')) loadProjects();
+  if (document.getElementById('detail-title')) loadProjectDetail();
 });
 
-// --- LİSTELEME VE FİLTRELEME FONKSİYONU ---
+function initAOS() {
+  if (window.AOS && typeof window.AOS.init === 'function') {
+    window.AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 90 });
+  }
+}
+
+function initMobileMenu() {
+  const hamburger = document.querySelector('.hamburger');
+  const navMenu = document.querySelector('.nav-menu');
+  if (!hamburger || !navMenu) return;
+
+  hamburger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    document.body.classList.toggle('menu-open', navMenu.classList.contains('active'));
+    hamburger.setAttribute('aria-expanded', String(navMenu.classList.contains('active')));
+    hamburger.innerHTML = navMenu.classList.contains('active')
+      ? '<i class="fas fa-times"></i>'
+      : '<i class="fas fa-bars"></i>';
+  });
+
+  document.querySelectorAll('.dropdown > .nav-link').forEach(link => {
+    link.addEventListener('click', event => {
+      if (window.innerWidth > 992) return;
+      const parent = link.parentElement;
+      if (!parent) return;
+      event.preventDefault();
+      parent.classList.toggle('open');
+    });
+  });
+
+  document.querySelectorAll('.nav-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth > 992) return;
+      if (!link.closest('.dropdown-content')) {
+        navMenu.classList.remove('active');
+        document.body.classList.remove('menu-open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    });
+  });
+}
+
+function initScrollAnimations() {
+  const items = document.querySelectorAll('.fade-up');
+  if (!items.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  items.forEach(item => observer.observe(item));
+}
+
+function highlightActiveLinks() {
+  const current = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('[data-page]').forEach(link => {
+    if (link.dataset.page === current) link.classList.add('active');
+  });
+}
+
+function isEnglish() {
+  return document.documentElement.lang.toLowerCase().startsWith('en');
+}
+
+function dataPath() {
+  return isEnglish() ? '../data/projects.json' : 'data/projects.json';
+}
+
+function assetPath(path) {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  return isEnglish() ? `../${path}` : path;
+}
+
+function detailPagePath(id) {
+  return `proje-detay.html?id=${id}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function fetchProjects() {
+  const response = await fetch(dataPath(), { cache: 'no-store' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+function normalizeText(value) {
+  return String(value || '')
+    .toLocaleLowerCase('tr-TR')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function getQueryFilters() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    status: params.get('status'),
+    category: params.get('category'),
+    id: params.get('id')
+  };
+}
+
+function filterProjects(projects) {
+  const { status, category } = getQueryFilters();
+  let filtered = [...projects];
+  if (status === 'tamamlandi') {
+    filtered = filtered.filter(project => {
+      const value = normalizeText(project.status);
+      return value.includes('tamamlandi') || value.includes('completed');
+    });
+  } else if (status === 'devam-ediyor') {
+    filtered = filtered.filter(project => {
+      const value = normalizeText(project.status);
+      return value.includes('devam ediyor') || value.includes('in progress');
+    });
+  }
+
+  if (category === 'altyapi') {
+    filtered = filtered.filter(project => normalizeText(project.category).includes('altyapi') || normalizeText(project.category).includes('infrastructure'));
+  } else if (category === 'konut') {
+    filtered = filtered.filter(project => ['konut', 'ustyapi', 'üstyapi', 'residential'].some(item => normalizeText(project.category).includes(normalizeText(item))));
+  } else if (category === 'endustriyel') {
+    filtered = filtered.filter(project => normalizeText(project.category).includes('endustriyel') || normalizeText(project.category).includes('industrial'));
+  }
+  return filtered;
+}
+
+function createFilterBar() {
+  const { status } = getQueryFilters();
+  const labels = isEnglish()
+    ? {
+        all: 'All Projects',
+        completed: 'Completed',
+        ongoing: 'In Progress'
+      }
+    : {
+        all: 'Tüm Projeler',
+        completed: 'Tamamlanan',
+        ongoing: 'Devam Eden'
+      };
+
+  return `
+    <div class="filter-bar fade-up is-visible">
+      <a class="filter-chip ${!status ? 'active' : ''}" href="projeler.html">${labels.all}</a>
+      <a class="filter-chip ${status === 'tamamlandi' ? 'active' : ''}" href="projeler.html?status=tamamlandi">${labels.completed}</a>
+      <a class="filter-chip ${status === 'devam-ediyor' ? 'active' : ''}" href="projeler.html?status=devam-ediyor">${labels.ongoing}</a>
+    </div>
+  `;
+}
+
 async function loadProjects() {
-    try {
-        const response = await fetch('data/projects.json');
-        let projects = await response.json(); 
-        const projectList = document.getElementById('project-list');
+  const projectList = document.getElementById('project-list');
+  if (!projectList) return;
+  try {
+    const projects = filterProjects(await fetchProjects());
+    const emptyText = isEnglish()
+      ? 'There are no projects matching this filter yet.'
+      : 'Bu filtreye uygun proje henüz bulunmuyor.';
 
-        // 1. URL'deki gizli şifreleri (parametreleri) yakala
-        const urlParams = new URLSearchParams(window.location.search);
-        const statusFilter = urlParams.get('status');
-        const categoryFilter = urlParams.get('category'); // YENİ: Kategori şifresi
+    const filterBarHost = document.getElementById('project-filter-bar');
+    if (filterBarHost) filterBarHost.innerHTML = createFilterBar();
 
-        // 2. Duruma (Tamamlandı/Devam Eden) göre filtrele
-        if (statusFilter === 'tamamlandi') {
-            projects = projects.filter(p => p.status === 'Tamamlandı');
-        } else if (statusFilter === 'devam-ediyor') {
-            projects = projects.filter(p => p.status === 'Devam Ediyor');
-        }
-
-        // 3. Kategoriye (Faaliyet Alanı) göre filtrele
-        // Not: JSON'daki yazım farklılıklarını (Büyük/küçük harf) tolere etmek için toUpperCase kullandık.
-        if (categoryFilter === 'altyapi') {
-            projects = projects.filter(p => p.category.toUpperCase().includes('ALTYAPI'));
-        } else if (categoryFilter === 'konut') {
-            projects = projects.filter(p => p.category.toUpperCase().includes('KONUT') || p.category.toUpperCase().includes('ÜSTYAPI'));
-        } else if (categoryFilter === 'endustriyel') {
-            projects = projects.filter(p => p.category.toUpperCase().includes('ENDÜSTRİYEL'));
-        }
-
-        projectList.innerHTML = '';
-
-        // Eğer o kategoride proje yoksa ekrana mesaj yaz
-        if (projects.length === 0) {
-            projectList.innerHTML = '<h3 style="text-align:center; width:100%; color:#666; padding: 50px 0;">Bu kategoride henüz proje bulunmamaktadır.</h3>';
-            return; 
-        }
-
-        // 4. Filtrelenmiş projeleri ekrana bas
-        projects.forEach(project => {
-            const projectCard = `
-                <a href="proje-detay.html?id=${project.id}" class="project-card" style="text-decoration: none; color: inherit; display: block;">
-                    <div class="status-badge">${project.status}</div>
-                    <img src="${project.image}" alt="${project.title}" onerror="this.src='https://placehold.co/600x400?text=Görsel+Yok'">
-                    <div class="card-info">
-                        <span class="category">${project.category}</span>
-                        <h3>${project.title}</h3>
-                        <p class="location"><i class="fas fa-map-marker-alt"></i> ${project.location}</p>
-                    </div>
-                </a>
-            `;
-            projectList.innerHTML += projectCard;
-        });
-
-    } catch (error) {
-        console.error('Projeler yüklenirken hata:', error);
+    if (!projects.length) {
+      projectList.innerHTML = `<div class="empty-state">${emptyText}</div>`;
+      return;
     }
+
+    projectList.innerHTML = projects.map(project => `
+      <a href="${detailPagePath(project.id)}" class="project-card fade-up">
+        <div class="status-badge">${escapeHtml(project.status)}</div>
+        <img src="${assetPath(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy">
+        <div class="card-info">
+          <span class="category">${escapeHtml(project.category)}</span>
+          <h3>${escapeHtml(project.title)}</h3>
+          <p class="location"><i class="fas fa-map-marker-alt"></i>${escapeHtml(project.location)}</p>
+        </div>
+      </a>
+    `).join('');
+    initScrollAnimations();
+  } catch (error) {
+    console.error('Projects could not be loaded:', error);
+    projectList.innerHTML = `<div class="empty-state">${isEnglish() ? 'Project data could not be loaded.' : 'Proje verileri yüklenemedi.'}</div>`;
+  }
 }
 
-// --- DETAY SAYFASI FONKSİYONU ---
-async function loadProjectDetails() {
-    try {
-        // 1. URL'deki id'yi al (örn: proje-detay.html?id=1 ise 1'i alır)
-        const urlParams = new URLSearchParams(window.location.search);
-        const projectId = parseInt(urlParams.get('id'));
-
-        // 2. Veritabanını çek
-        const response = await fetch('data/projects.json');
-        const projects = await response.json();
-
-        // 3. ID'si eşleşen projeyi bul
-        const project = projects.find(p => p.id === projectId);
-
-        if (project) {
-            // Bulunan verileri HTML kutularına yerleştir
-            document.title = `${project.title} | Alila Mühendislik`;
-            document.getElementById('detail-title').textContent = project.title;
-            document.getElementById('detail-category').textContent = project.category;
-            document.getElementById('detail-desc').textContent = project.description;
-            document.getElementById('detail-image').src = project.image;
-            
-            // Teknik Tabloyu Doldur
-            document.getElementById('t-location').textContent = project.location;
-            document.getElementById('t-year').textContent = project.year;
-            document.getElementById('t-status').textContent = project.status;
-        } else {
-            document.getElementById('project-detail-content').innerHTML = '<h2 style="text-align:center">Proje bulunamadı.</h2>';
-        }
-
-    } catch (error) {
-        console.error('Detay yüklenirken hata:', error);
-    }
-}
-
-// --- PROJE DETAY YÜKLEME FONKSİYONU ---
 async function loadProjectDetail() {
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const projectId = urlParams.get('id');
-
-        if (!projectId) return; // ID yoksa dur
-
-        const response = await fetch('data/projects.json');
-        const projects = await response.json();
-
-        const project = projects.find(p => p.id == projectId);
-
-        if (project) {
-            // HTML'deki yerleri JSON'daki gerçek verilerle doldurur
-            document.getElementById('detail-title').innerText = project.title;
-            document.getElementById('detail-image').src = project.image;
-            document.getElementById('detail-category').innerText = project.category;
-            document.getElementById('detail-status').innerText = project.status;
-            document.getElementById('detail-location').innerText = project.location;
-            document.getElementById('detail-description').innerText = project.description;
-            // YENİ: Galeri fotoğraflarını ekrana basma
-            const galleryContainer = document.getElementById('detail-gallery');
-            const galleryBox = document.querySelector('.detail-gallery-box');
-            
-            if (galleryContainer && galleryBox) {
-                galleryContainer.innerHTML = ''; // Önce içini temizle
-                
-                // Eğer projede ekstra fotoğraf varsa dizecek
-                if (project.gallery && project.gallery.length > 0) {
-                    galleryBox.style.display = 'block'; // Kutuyu görünür yap
-                    project.gallery.forEach(imgUrl => {
-                        // Resimler aşağıdan animasyonla gelsin
-                        galleryContainer.innerHTML += `<img src="${imgUrl}" alt="Proje Detay Görseli" data-aos="fade-up">`;
-                    });
-                } else {
-                    // Eğer ekstra fotoğraf yoksa galeri kutusunu tamamen gizle ki boş durmasın
-                    galleryBox.style.display = 'none';
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Proje detayı yüklenirken hata:', error);
+  const titleNode = document.getElementById('detail-title');
+  if (!titleNode) return;
+  try {
+    const { id } = getQueryFilters();
+    if (!id) return;
+    const projects = await fetchProjects();
+    const project = projects.find(item => String(item.id) === String(id));
+    if (!project) {
+      titleNode.textContent = isEnglish() ? 'Project Not Found' : 'Proje Bulunamadı';
+      return;
     }
+
+    document.title = `${project.title} | ${isEnglish() ? 'Alila Engineering' : 'Alila Mühendislik'}`;
+    titleNode.textContent = project.title;
+    setText('detail-category', project.category);
+    setText('detail-status', project.status);
+    setText('detail-location', project.location);
+    setText('detail-description', project.description || (isEnglish() ? 'Detailed information will be shared soon.' : 'Detaylı bilgiler yakında paylaşılacaktır.'));
+
+    const imageNode = document.getElementById('detail-image');
+    if (imageNode) {
+      imageNode.src = assetPath(project.image);
+      imageNode.alt = project.title;
+    }
+
+    const galleryContainer = document.getElementById('detail-gallery');
+    const galleryBox = document.querySelector('.detail-gallery-box');
+    if (galleryContainer && galleryBox) {
+      const gallery = Array.isArray(project.gallery) ? project.gallery : [];
+      if (!gallery.length) {
+        galleryBox.style.display = 'none';
+      } else {
+        galleryBox.style.display = 'block';
+        galleryContainer.innerHTML = gallery.map((img, index) => `
+          <img src="${assetPath(img)}" alt="${escapeHtml(project.title)} ${index + 1}" loading="lazy" class="fade-up">
+        `).join('');
+      }
+    }
+    initScrollAnimations();
+  } catch (error) {
+    console.error('Project detail could not be loaded:', error);
+  }
+}
+
+function setText(id, value) {
+  const node = document.getElementById(id);
+  if (node) node.textContent = value ?? '-';
 }
