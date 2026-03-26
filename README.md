@@ -2,8 +2,7 @@
 
 A modern, fully responsive, and bilingual corporate web application developed for Alila Engineering. This project aims to reflect the company's innovative engineering solutions and sustainable design vision in the digital world.
 
-## Live Demo
-You can view the live version of the website here: **[https://alila-muhendislik.netlify.app/]**
+You can click on http://alilamuhendislik.com/ to see the website
 
 ## Key Features
 * **Bilingual Support (TR/EN):** Fully translated infrastructure including menus, content, and dynamic components.
