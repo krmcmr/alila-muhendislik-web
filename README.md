@@ -2,7 +2,8 @@
 
 A modern, fully responsive, and bilingual corporate web application developed for Alila Engineering. This project aims to reflect the company's innovative engineering solutions and sustainable design vision in the digital world.
 
-You can click on http://alilamuhendislik.com/ to see the website
+You can click on https://alilamuhendislik.com/ to see the website
+
 
 ## Key Features
 * **Bilingual Support (TR/EN):** Fully translated infrastructure including menus, content, and dynamic components.
